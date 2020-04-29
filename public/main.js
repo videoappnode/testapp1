@@ -18,12 +18,19 @@ navigator.mediaDevices.getUserMedia({ video: true, audio: true })
             peer.on('stream', function (stream) {
                 CreateVideo(stream)
             })
-            peer.on('close' ,function() {
-                document.getElementById("peerVideo").remove();
-                peer.destroy()
+            peer.on('data', function (data) {
+                let decodedData = new TextDecoder('utf-8').decode(data)
+                let peervideo = document.querySelector('#peerVideo')
             })
             return peer
+
+            // peer.on('close' ,function() {
+            //     document.getElementById("peerVideo").remove();
+            //     peer.destroy()
+            // })
+            // return peer
         }
+
 
         //for peer of type init
         function MakePeer() {
@@ -81,12 +88,33 @@ navigator.mediaDevices.getUserMedia({ video: true, audio: true })
             document.write('Session Active. Please come back later')
         }
 
+        function RemovePeer() {
+            document.getElementById("peerVideo").remove();
+            document.getElementById("muteText").remove();
+            if (client.peer) {
+                client.peer.destroy()
+            }
+        }
+
 
         socket.on('Backoffer' , FrontAnswer);
         socket.on('BackAnswer', SignalAnswer);
         socket.on('SessionActive' , SessionActive);
         socket.on('createrPeer' , MakePeer);
+        socket.on('Disconnect', RemovePeer)
 
 
 
     }).catch(err => document.write(err))
+
+
+
+    // function CreateDiv() {
+    //     let div = document.createElement('div')
+    //     div.setAttribute('class', "centered")
+    //     div.id = "muteText"
+    //     div.innerHTML = "Click to Mute/Unmute"
+    //     document.querySelector('#peerDiv').appendChild(div)
+    //     if (checkboxTheme.checked == true)
+    //         document.querySelector('#muteText').style.color = "#fff"
+    // }
